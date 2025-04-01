@@ -1,3 +1,5 @@
+import { client } from "../../api/client"
+
 const initialState = [
     { id: 0, text: 'Learn React', completed: true },
     { id: 1, text: 'Learn Redux', completed: false, color: 'purple' },
@@ -11,15 +13,12 @@ function nextTodoId(todos) {
 
 export default function todosReducer(state=initialState, action) {
   switch (action.type) {
+    case "todos/todosLoaded": {
+      return action.payload
+    }
     case 'todos/todoAdded': {
       return [
-        ...state,
-        {
-          id: nextTodoId(state),
-          text: action.payload,
-          completed: false
-        }
-        
+        ...state, action.payload
       ]
     }
     case "todos/todoToggled": {
@@ -57,4 +56,17 @@ export default function todosReducer(state=initialState, action) {
     default:
       return state
   }
+}
+
+export async function fetchTodos(dispatch, getState) {
+  const response = await client.get("/fakeApi/todos")
+  dispatch({type: 'todos/todosLoaded', payload: response.todos})
+}
+
+export const saveNewTodo = text => async (dispatch, getState) => {
+  const initialTodo = {text}
+  const response = await client.post('/fakeApi/todos', {
+    todo: initialTodo
+  })
+  dispatch({type: "todos/todoAdded", payload: response.todo})
 }
