@@ -5,10 +5,12 @@ import StatusFilter from "../../shared/ui/statusFilter/StatusFilters";
 import RemainingTodos from "../../shared/ui/remainingTodos/RemainingTodos";
 import ColorFilters from "../../shared/ui/colorFilter/ColorFilter";
 
+import { colorFilterChanged } from "../filters/filtersSlice";
+
+
 const Footer = () => {
   const  todosRemaining = useSelector(state => {
-    const uncompletedTodos = state.todos.filter(todo => !todo.completed);
-    return uncompletedTodos.length;
+    return Object.values(state.todos.entities).map(todo => !todo.completed).length;
   })
 
   const dispatch = useDispatch()
@@ -16,7 +18,7 @@ const Footer = () => {
   const {status, colors} = useSelector(state => state.filters)
 
   const onColorChange = (color, changeType) => {
-    dispatch({type: "filters/colorFilterChanged", payload: {color, changeType}})
+    dispatch(colorFilterChanged(color, changeType))
   }
 
   const onStatusChange = (status) => dispatch({type: "filters/statusFilterChanged", payload: status})
